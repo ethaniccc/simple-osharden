@@ -2,7 +2,6 @@ package script
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"strings"
@@ -50,14 +49,8 @@ func (u *UpdateDNS) Description() string {
 
 func (u *UpdateDNS) Run() error {
 	file := "/etc/resolv.conf"
-	f, err := os.OpenFile(file, os.O_RDWR, 0644)
-	if err != nil {
-		return fmt.Errorf("unable to open /etc/resolv.conf: %s", err.Error())
-	}
-	defer f.Close()
 
-	// Read the contents of the file.
-	buffer, err := io.ReadAll(f)
+	buffer, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("unable to read /etc/resolv.conf: %s", err.Error())
 	}
