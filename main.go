@@ -33,28 +33,41 @@ func main() {
 		os.Exit(1)
 	}()
 
+	log.Info("Updating repositories...")
+	script.RunCommand("apt update")
+	script.RunCommand("reset")
+
 	for {
+		script.RunCommand("reset")
 		res := mainPrompt()
+		if res == "exit" {
+			script.RunCommand("reset")
+			os.Exit(0)
+			return
+		}
+
 		s := script.GetScript(res)
 		if s == nil {
 			log.Errorf("\"%s\" is not a valid script.", res)
+			<-time.After(time.Second * 3)
 			continue
 		}
 
+		script.RunCommand("reset")
 		if err := s.Run(); err != nil {
-			log.Error(err)
+			log.Errorf("Error running script: %s", err.Error())
 		} else {
 			log.Info("The script ran successfully! Returning to main menu in 3 seconds...")
 		}
-
 		<-time.After(time.Second * 3)
-		script.CreateCommand("reset").Run()
 	}
 }
 
 func mainPrompt() string {
 	return prompt.Input("Chose a command >> ", func(d prompt.Document) []prompt.Suggest {
 		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "exit", Description: "Exits the program"},
+
 			{Text: "firewall", Description: "Installs and configures the UFW firewall"},
 		}, d.GetWordBeforeCursor(), true)
 	}, prompts.DummyPromptOption)
