@@ -54,7 +54,7 @@ func RunCommand(c string) error {
 // GetCommandOutput runs a command and returns the output.
 func GetCommandOutput(c string) (string, error) {
 	split := strings.Split(c, " ")
-	cmd := CreateCommand(split[0], split[1:]...)
+	cmd := exec.Command(split[0], split[1:]...)
 	out, err := cmd.Output()
 	return string(out), err
 }
