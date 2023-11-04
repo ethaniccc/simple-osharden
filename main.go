@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/c-bata/go-prompt"
@@ -65,10 +66,17 @@ func main() {
 
 func mainPrompt() string {
 	return prompt.Input("Chose a command >> ", func(d prompt.Document) []prompt.Suggest {
-		return prompt.FilterHasPrefix([]prompt.Suggest{
+		list := []prompt.Suggest{
 			{Text: "exit", Description: "Exits the program"},
+		}
 
-			{Text: "firewall", Description: "Installs and configures the UFW firewall"},
-		}, d.GetWordBeforeCursor(), true)
+		for _, s := range script.AvailableScripts() {
+			list = append(list, prompt.Suggest{
+				Text:        strings.ToLower(s.Name()),
+				Description: s.Description(),
+			})
+		}
+
+		return prompt.FilterHasPrefix(list, d.GetWordBeforeCursor(), true)
 	}, prompts.DummyPromptOption)
 }

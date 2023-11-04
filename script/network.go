@@ -3,6 +3,14 @@ package script
 type Firewall struct {
 }
 
+func (f *Firewall) Name() string {
+	return "Firewall"
+}
+
+func (f *Firewall) Description() string {
+	return "Installs UFW and configures it."
+}
+
 func (f *Firewall) Run() error {
 	return ExecuteLoggedCommands([]LoggedCommand{
 		{"Installing UFW", "apt install ufw", true},
