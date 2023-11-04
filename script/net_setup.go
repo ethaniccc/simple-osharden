@@ -9,21 +9,21 @@ import (
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
-// Network is a script that installs and enables UFW, and sets other network settings.
+// NetworkSetup is a script that installs and enables UFW, and sets other network settings.
 // By default, it allows SSH connections, and rejects all other incoming connections.
 // All outgoing connections are allowed by default.
-type Network struct {
+type NetworkSetup struct {
 }
 
-func (f *Network) Name() string {
-	return "network-setup"
+func (s *NetworkSetup) Name() string {
+	return "net-setup"
 }
 
-func (f *Network) Description() string {
+func (s *NetworkSetup) Description() string {
 	return "Installs and configures firewall, and sets other network settings."
 }
 
-func (f *Network) Run() error {
+func (s *NetworkSetup) Run() error {
 	if err := ExecuteLoggedCommands([]LoggedCommand{
 		{"Installing UFW", "apt install ufw", true},
 		{"Enabling UFW Firewall", "ufw enable", false},

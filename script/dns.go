@@ -15,15 +15,15 @@ import (
 type UpdateDNS struct {
 }
 
-func (u *UpdateDNS) Name() string {
+func (s *UpdateDNS) Name() string {
 	return "dns-update"
 }
 
-func (u *UpdateDNS) Description() string {
+func (s *UpdateDNS) Description() string {
 	return "Checks and updates the DNS servers."
 }
 
-func (u *UpdateDNS) Run() error {
+func (s *UpdateDNS) Run() error {
 	file := "/etc/resolv.conf"
 
 	buffer, err := os.ReadFile(file)

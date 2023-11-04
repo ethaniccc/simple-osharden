@@ -14,15 +14,15 @@ import (
 type NetApps struct {
 }
 
-func (r *NetApps) Name() string {
+func (s *NetApps) Name() string {
 	return "net-apps"
 }
 
-func (r *NetApps) Description() string {
+func (s *NetApps) Description() string {
 	return "Checks for any applications that are listening on ports."
 }
 
-func (r *NetApps) Run() error {
+func (s *NetApps) Run() error {
 	output, err := GetCommandOutput("netstat -tunlpw")
 	if err != nil {
 		return fmt.Errorf("unable to get netstat data: %s", err.Error())
@@ -57,7 +57,7 @@ func (r *NetApps) Run() error {
 			continue
 		}
 
-		if err := r.uninstall(proc); err != nil {
+		if err := s.uninstall(proc); err != nil {
 			return fmt.Errorf("unable to uninstall program: %s", err.Error())
 		}
 	}
@@ -71,7 +71,7 @@ func (r *NetApps) Run() error {
 }
 
 // uninstall will uninstall the program and remove any traces of it.
-func (r *NetApps) uninstall(program string) error {
+func (s *NetApps) uninstall(program string) error {
 	// Uninstall the program.
 	RunCommand(fmt.Sprintf("apt purge %s", program))
 
