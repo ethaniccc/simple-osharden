@@ -9,30 +9,6 @@ import (
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
-// Firewall is a script that installs UFW and configures it. By default, it allows SSH
-// connections, and rejects all other incoming connections. All outgoing connections
-// are allowed by default.
-type Firewall struct {
-}
-
-func (f *Firewall) Name() string {
-	return "firewall"
-}
-
-func (f *Firewall) Description() string {
-	return "Installs UFW and configures it."
-}
-
-func (f *Firewall) Run() error {
-	return ExecuteLoggedCommands([]LoggedCommand{
-		{"Installing UFW", "apt install ufw", true},
-		{"Enabling UFW Firewall", "ufw enable", true},
-		{"Allowing SSH through firewall", "ufw allow ssh", false},
-		{"Setting option to reject incoming connections by default", "ufw default reject incoming", false},
-		{"Setting option to allow outgoing connections by default", "ufw default allow outgoing", false},
-	})
-}
-
 // UpdateDNS is a script that checks for the current DNS servers. The user is then able
 // to confirm wether or not they want to keep that DNS server. If they do not, the DNS server
 // is removed. The user is then able to add new DNS servers if they wish to.
@@ -74,14 +50,19 @@ func (u *UpdateDNS) Run() error {
 	// Ask the user if they want to add additional DNS servers.
 	if !prompts.Confirm("Would you like to add new DNS servers?") {
 		// Write the new data to the file, since DNS servers could have been removed.
-		return os.WriteFile(file, []byte(data), 0644)
+		if err := os.WriteFile(file, []byte(data), 0644); err != nil {
+			return fmt.Errorf("unable to write /etc/resolv.conf: %s", err.Error())
+		}
+
+		return nil
 	}
 
-	newServers := []string{}
+	first := true
 	for {
-		if len(newServers) != 0 && !prompts.Confirm("Would you like to add another DNS server?") {
+		if !first && !prompts.Confirm("Would you like to add another DNS server?") {
 			break
 		}
+		first = false
 
 		newServer := prompts.RawResponsePrompt("DNS server IP address")
 		if newServer == "" {
@@ -94,12 +75,7 @@ func (u *UpdateDNS) Run() error {
 			continue
 		}
 
-		newServers = append(newServers, newServer)
-	}
-
-	// Write the new DNS servers to the file.
-	for _, server := range newServers {
-		data += fmt.Sprintf("nameserver %s\n", server)
+		data += fmt.Sprintf("nameserver %s\n", newServer)
 	}
 
 	if err := os.WriteFile(file, []byte(data), 0644); err != nil {

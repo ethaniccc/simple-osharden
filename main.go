@@ -58,7 +58,7 @@ func main() {
 }
 
 func mainPrompt() string {
-	return prompt.Input("Chose a command >> ", func(d prompt.Document) []prompt.Suggest {
+	return prompt.Input("Enter a command: ", func(d prompt.Document) []prompt.Suggest {
 		list := []prompt.Suggest{
 			{Text: "exit", Description: "Quit Simple-OSHarden."},
 		}

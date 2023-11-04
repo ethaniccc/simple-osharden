@@ -42,3 +42,8 @@ func GetScript(name string) Script {
 func RegisterScript(s Script) {
 	scriptPool[s.Name()] = s
 }
+
+// UnregisterScript unregisters a script from the script pool.
+func UnregisterScript(name string) {
+	delete(scriptPool, name)
+}
