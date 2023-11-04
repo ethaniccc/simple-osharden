@@ -37,7 +37,7 @@ func main() {
 		res := mainPrompt()
 		s := script.GetScript(res)
 		if s == nil {
-			log.Errorf("\"Z%s\" is not a valid script.", res)
+			log.Errorf("\"%s\" is not a valid script.", res)
 			continue
 		}
 
