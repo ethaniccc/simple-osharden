@@ -4,7 +4,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/c-bata/go-prompt"
@@ -23,16 +22,10 @@ func main() {
 	// Run the inital prompt.
 	log = logrus.New()
 
+	// Make sure the user running this script is an admin.
+	adminCheck()
 	// Handle ctrl+c in a goroutine.
-	go func() {
-		sigchan := make(chan os.Signal, 1)
-		signal.Notify(sigchan, os.Interrupt)
-
-		<-sigchan
-
-		script.CreateCommand("reset").Run()
-		os.Exit(1)
-	}()
+	go handleInterrupt()
 
 	log.Info("Updating repositories...")
 	script.RunCommand("apt update")
@@ -67,16 +60,32 @@ func main() {
 func mainPrompt() string {
 	return prompt.Input("Chose a command >> ", func(d prompt.Document) []prompt.Suggest {
 		list := []prompt.Suggest{
-			{Text: "exit", Description: "Exits the program"},
+			{Text: "exit", Description: "Quit Simple-OSHarden."},
 		}
 
 		for _, s := range script.AvailableScripts() {
 			list = append(list, prompt.Suggest{
-				Text:        strings.ToLower(s.Name()),
+				Text:        s.Name(),
 				Description: s.Description(),
 			})
 		}
 
 		return prompt.FilterHasPrefix(list, d.GetWordBeforeCursor(), true)
 	}, prompts.DummyPromptOption)
+}
+
+func handleInterrupt() {
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, os.Interrupt)
+
+	<-sigchan
+
+	script.CreateCommand("reset").Run()
+	os.Exit(1)
+}
+
+func adminCheck() {
+	if os.Getuid() != 0 {
+		log.Fatal("This program must be run as root.")
+	}
 }

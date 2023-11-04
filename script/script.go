@@ -7,7 +7,8 @@ var logger *logrus.Logger
 func init() {
 	logger = logrus.New()
 
-	RegisterScript("firewall", &Firewall{})
+	RegisterScript(&Firewall{})
+	RegisterScript(&UpdateDNS{})
 }
 
 type Script interface {
@@ -38,6 +39,6 @@ func GetScript(name string) Script {
 }
 
 // RegisterScript registers a script to the script pool.
-func RegisterScript(name string, s Script) {
-	scriptPool[name] = s
+func RegisterScript(s Script) {
+	scriptPool[s.Name()] = s
 }
