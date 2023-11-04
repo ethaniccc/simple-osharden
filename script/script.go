@@ -7,7 +7,7 @@ var logger *logrus.Logger
 func init() {
 	logger = logrus.New()
 
-	RegisterScript(&Firewall{})
+	RegisterScript(&Network{})
 	RegisterScript(&UpdateDNS{})
 }
 

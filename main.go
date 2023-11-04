@@ -36,7 +36,9 @@ func main() {
 		res := mainPrompt()
 		if res == "exit" {
 			script.RunCommand("reset")
-			os.Exit(0)
+			return
+		} else if res == "reboot" {
+			script.RunCommand("shutdown -r 0")
 			return
 		}
 
@@ -61,6 +63,7 @@ func mainPrompt() string {
 	return prompt.Input("Enter a command: ", func(d prompt.Document) []prompt.Suggest {
 		list := []prompt.Suggest{
 			{Text: "exit", Description: "Quit Simple-OSHarden."},
+			{Text: "reboot", Description: "Reboot the machine."},
 		}
 
 		for _, s := range script.AvailableScripts() {
@@ -80,7 +83,7 @@ func handleInterrupt() {
 
 	<-sigchan
 
-	script.CreateCommand("reset").Run()
+	script.RunCommand("reset")
 	os.Exit(1)
 }
 

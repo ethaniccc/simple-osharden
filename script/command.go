@@ -4,6 +4,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
 // LoggedCommand is a command wrapper that includes a log message.
@@ -47,4 +49,21 @@ func CreateCommand(c string, args ...string) *exec.Cmd {
 func RunCommand(c string) error {
 	split := strings.Split(c, " ")
 	return CreateCommand(split[0], split[1:]...).Run()
+}
+
+// GetCommandOutput runs a command and returns the output.
+func GetCommandOutput(c string) (string, error) {
+	split := strings.Split(c, " ")
+	cmd := CreateCommand(split[0], split[1:]...)
+	out, err := cmd.Output()
+	return string(out), err
+}
+
+// ConfirmCommand runs a command if the user confirms it should be run.
+func ConfirmCommand(msg, c string) error {
+	if !prompts.Confirm(msg) {
+		return nil
+	}
+
+	return RunCommand(c)
 }
