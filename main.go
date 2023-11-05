@@ -64,6 +64,7 @@ func main() {
 			log.Info("The script ran successfully! Returning to main menu in 3 seconds...")
 		}
 		<-time.After(time.Second * 3)
+		runtime.GC()
 	}
 }
 
@@ -73,7 +74,7 @@ func mainPrompt() string {
 |     |   __|  |  |___ ___ _| |___ ___ 
 |  |  |__   |     | .'|  _| . | -_|   |
 |_____|_____|__|__|__,|_| |___|___|_|_|			
-																																							
+
 - @ethaniccc						
 
 
