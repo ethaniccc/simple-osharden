@@ -2,11 +2,15 @@ package script
 
 import "github.com/ethaniccc/simple-osharden/prompts"
 
+func init() {
+	RegisterScript(&RemovePrograms{})
+}
+
 type RemovePrograms struct {
 }
 
 func (s *RemovePrograms) Name() string {
-	return "rm-programs"
+	return "programs-rm"
 }
 
 func (s *RemovePrograms) Description() string {
