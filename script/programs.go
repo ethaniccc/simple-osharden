@@ -72,5 +72,6 @@ func (s *RemovePrograms) Run() error {
 		})
 	}
 
+	RunCommand("reset")
 	return ExecuteLoggedCommands(commands)
 }
