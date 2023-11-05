@@ -68,23 +68,16 @@ func main() {
 }
 
 func mainPrompt() string {
-	msg := `
-███████╗██╗███╗   ███╗██████╗ ██╗     ███████╗     ██████╗ ███████╗██╗  ██╗ █████╗ ██████╗ ██████╗ ███████╗███╗   ██╗
-██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝    ██╔═══██╗██╔════╝██║  ██║██╔══██╗██╔══██╗██╔══██╗██╔════╝████╗  ██║
-███████╗██║██╔████╔██║██████╔╝██║     █████╗█████╗██║   ██║███████╗███████║███████║██████╔╝██║  ██║█████╗  ██╔██╗ ██║
-╚════██║██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝╚════╝██║   ██║╚════██║██╔══██║██╔══██║██╔══██╗██║  ██║██╔══╝  ██║╚██╗██║
-███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗    ╚██████╔╝███████║██║  ██║██║  ██║██║  ██║██████╔╝███████╗██║ ╚████║
-╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝     ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝
-																																										
-- @ethaniccc / benjamin s.												
+	msg := `          
+ _____ _____ _____           _         
+|     |   __|  |  |___ ___ _| |___ ___ 
+|  |  |__   |     | .'|  _| . | -_|   |
+|_____|_____|__|__|__,|_| |___|___|_|_|																																										
+- @ethaniccc						
+						
 
 Simple-OSHarden is a tool that can be used to harden your machine. 
 As of Nov. 4, 2023, this tool is in beta, and only supports linux.
-
-As a student, I aspire to learn more about cybersecurity, and this
-is one of my first projects relating to it. If there's any issues
-or suggestions you'd like to report, please do so on the Github
-repository. You're the best!
 
 If for any reason, you'd like to contact me, please send an email
 to benjaminscyber@skiff.com. I'll try to respond as soon as I can.
