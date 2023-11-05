@@ -41,6 +41,13 @@ func main() {
 		} else if res == "reboot" {
 			script.RunCommand("shutdown -r 0")
 			return
+		} else if res == "help" {
+			for _, s := range script.AvailableScripts() {
+				log.Infof("%s - %s\n", s.Name(), s.Description())
+			}
+
+			prompts.RawResponsePrompt("Press enter to continue")
+			continue
 		}
 
 		s := script.GetScript(res)
@@ -89,8 +96,9 @@ Source code: https://github.com/ethaniccc/simple-osharden
 	fmt.Println(msg)
 	return prompt.Input("Enter a command >> ", func(d prompt.Document) []prompt.Suggest {
 		list := []prompt.Suggest{
-			{Text: "exit", Description: "Quit Simple-OSHarden."},
+			{Text: "help", Description: "Display a list of commands."},
 			{Text: "reboot", Description: "Reboot the machine."},
+			{Text: "exit", Description: "Quit Simple-OSHarden."},
 		}
 
 		for _, s := range script.AvailableScripts() {
@@ -101,7 +109,7 @@ Source code: https://github.com/ethaniccc/simple-osharden
 		}
 
 		return prompt.FilterHasPrefix(list, d.GetWordBeforeCursor(), true)
-	}, prompts.DummyPromptOption)
+	}, prompt.OptionMaxSuggestion(16))
 }
 
 func handleInterrupt() {

@@ -39,8 +39,12 @@ func (s *ServiceConfiguration) Run() error {
 func (s *ServiceConfiguration) initService(service string) (bool, error) {
 	// Check if the user wants the service to be running.
 	if !prompts.Confirm(fmt.Sprintf("Should %s be enabled on this machine?", service)) {
+		logger.Warnf("stopping %s", service)
 		RunCommand("systemctl stop " + service)
+
+		logger.Warnf("disabling %s", service)
 		RunCommand("systemctl disable " + service)
+
 		return false, nil
 	}
 
@@ -59,9 +63,6 @@ func (s *ServiceConfiguration) initService(service string) (bool, error) {
 }
 
 func (s *ServiceConfiguration) configureFTP() error {
-	defer RunCommand("reset")
-	RunCommand("reset")
-
 	c, err := s.initService("vsftpd")
 	if err != nil {
 		return fmt.Errorf("unable to initialize vsftpd service: %s", err.Error())
@@ -139,14 +140,12 @@ func (s *ServiceConfiguration) configureFTP() error {
 	if err := os.WriteFile("/etc/vsftpd.conf", []byte(strings.Join(lines, "\n")), 0644); err != nil {
 		return fmt.Errorf("unable to write vsftpd.conf: %s", err.Error())
 	}
+	logger.Info("Data written to vsftpd.conf")
 
 	return nil
 }
 
 func (s *ServiceConfiguration) configureSSH() error {
-	defer RunCommand("reset")
-	RunCommand("reset")
-
 	c, err := s.initService("ssh")
 	if err != nil {
 		return fmt.Errorf("unable to initialize ssh service: %s", err.Error())
@@ -218,9 +217,11 @@ func (s *ServiceConfiguration) configureSSH() error {
 	if err := os.WriteFile("/etc/ssh/sshd_config", []byte(strings.Join(lines, "\n")), 0644); err != nil {
 		return fmt.Errorf("unable to write sshd_config: %s", err.Error())
 	}
+	logger.Info("Data written to sshd_config")
 
 	if prompts.Confirm("Would you like to restart the SSH service?") {
 		RunCommand("systemctl restart sshd")
+		logger.Info("SSH service restarted")
 	}
 
 	return nil
