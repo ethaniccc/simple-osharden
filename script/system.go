@@ -6,6 +6,7 @@ func init() {
 	RegisterScript(&SystemConfiguration{})
 }
 
+// SystemConfiguration sets certain settings in /etc/sysctl.conf to further secure the system.
 type SystemConfiguration struct {
 }
 
