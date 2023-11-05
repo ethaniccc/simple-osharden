@@ -72,6 +72,12 @@ func (s *RemovePrograms) Run() error {
 		})
 	}
 
+	commands = append(commands, LoggedCommand{
+		LogMessage: "Removing unused packages",
+		Command:    "apt autoremove",
+		IgnoreErr:  true,
+	})
+
 	RunCommand("reset")
 	return ExecuteLoggedCommands(commands)
 }
