@@ -8,11 +8,15 @@ import (
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
+func init() {
+	RegisterScript(&ServiceConfiguration{})
+}
+
 type ServiceConfiguration struct {
 }
 
 func (s *ServiceConfiguration) Name() string {
-	return "service-config"
+	return "servicecfg"
 }
 
 func (s *ServiceConfiguration) Description() string {

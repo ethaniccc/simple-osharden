@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+func init() {
+	RegisterScript(&SystemConfiguration{})
+}
+
 type SystemConfiguration struct {
 }
 

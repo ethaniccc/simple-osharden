@@ -7,6 +7,10 @@ import (
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
+func init() {
+	RegisterScript(&NetApps{})
+}
+
 // NetApps is a script that checks for any applications that are listening on ports.
 // The user will confirm that these applications are allowed to listen on these ports, and if they're
 // not, the process will be killed. The user will also be prompted if the program should be

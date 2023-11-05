@@ -9,6 +9,10 @@ import (
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
+func init() {
+	RegisterScript(&NetworkSetup{})
+}
+
 // NetworkSetup is a script that installs and enables UFW, and sets other network settings.
 // By default, it allows SSH connections, and denies all other incoming connections.
 // All outgoing connections are allowed by default.

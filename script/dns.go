@@ -9,6 +9,10 @@ import (
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
+func init() {
+	RegisterScript(&UpdateDNS{})
+}
+
 // UpdateDNS is a script that checks for the current DNS servers. The user is then able
 // to confirm wether or not they want to keep that DNS server. If they do not, the DNS server
 // is removed. The user is then able to add new DNS servers if they wish to.

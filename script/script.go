@@ -6,14 +6,6 @@ var logger *logrus.Logger
 
 func init() {
 	logger = logrus.New()
-
-	RegisterScript(&NetworkSetup{})
-	RegisterScript(&UpdateDNS{})
-	RegisterScript(&NetApps{})
-
-	RegisterScript(&SystemConfiguration{})
-	RegisterScript(&ServiceConfiguration{})
-	RegisterScript(&RemovePrograms{})
 }
 
 type Script interface {
