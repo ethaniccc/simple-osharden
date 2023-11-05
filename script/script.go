@@ -12,6 +12,7 @@ func init() {
 	RegisterScript(&NetApps{})
 
 	RegisterScript(&SystemConfig{})
+	RegisterScript(&RemovePrograms{})
 }
 
 type Script interface {
