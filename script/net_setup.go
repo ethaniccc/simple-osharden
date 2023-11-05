@@ -1,12 +1,10 @@
 package script
 
 import (
-	"fmt"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/ethaniccc/simple-osharden/prompts"
+	"github.com/ethaniccc/simple-osharden/utils"
 )
 
 func init() {
@@ -39,12 +37,6 @@ func (s *NetworkSetup) Run() error {
 	}
 
 	networkOpts := map[string]string{}
-
-	buffer, err := os.ReadFile("/etc/sysctl.conf")
-	if err != nil {
-		return fmt.Errorf("unable to read /etc/sysctl.conf: %s", err.Error())
-	}
-	data := string(buffer)
 
 	if prompts.Confirm("Would you like to enable TCP SYN cookies?") {
 		networkOpts["net.ipv4.tcp_syncookies"] = "1"
@@ -87,27 +79,8 @@ func (s *NetworkSetup) Run() error {
 		networkOpts["net.ipv6.conf.default.disable_ipv6"] = "1"
 	}
 
-	lines := strings.Split(data, "\n")
-	for i, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		// The current option on the line.
-		cOpt := strings.ReplaceAll(strings.Split(strings.TrimSpace(line), "=")[0], "#", "")
-		if newVal, ok := networkOpts[cOpt]; ok {
-			lines[i] = cOpt + " = " + newVal
-			delete(networkOpts, cOpt)
-		}
-	}
-
-	// Add any new options that didn't previously exist on sysctl.conf
-	for opt, val := range networkOpts {
-		lines = append(lines, opt+" = "+val)
-	}
-
-	if err := os.WriteFile("/etc/sysctl.conf", []byte(strings.Join(lines, "\n")), 0644); err != nil {
-		return fmt.Errorf("unable to write new data to /etc/sysctl.conf: %s", err.Error())
+	if err := utils.WriteOptsToFile(networkOpts, " = ", "/etc/sysctl.conf"); err != nil {
+		return err
 	}
 
 	logger.Warnf("--------------- IMPORTANT ---------------")

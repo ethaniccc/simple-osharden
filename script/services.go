@@ -2,10 +2,10 @@ package script
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/ethaniccc/simple-osharden/prompts"
+	"github.com/ethaniccc/simple-osharden/utils"
 )
 
 func init() {
@@ -24,14 +24,20 @@ func (s *ServiceConfiguration) Description() string {
 }
 
 func (s *ServiceConfiguration) Run() error {
-	if prompts.Confirm("Would you like to configure the SSH service?") {
+	if prompts.Confirm("Would you like to configure SSH?") {
 		if err := s.configureSSH(); err != nil {
 			return err
 		}
 	}
 
-	if prompts.Confirm("Would you like to configure the FTP service?") {
+	if prompts.Confirm("Would you like to configure FTP?") {
 		if err := s.configureFTP(); err != nil {
+			return err
+		}
+	}
+
+	if prompts.Confirm("Would you like to configure Apache2?") {
+		if err := s.configureApache(); err != nil {
 			return err
 		}
 	}
@@ -82,11 +88,6 @@ func (s *ServiceConfiguration) configureFTP() error {
 		return fmt.Errorf("unable to allow ftp through firewall: %s", err.Error())
 	}
 
-	buffer, err := os.ReadFile("/etc/vsftpd.conf")
-	if err != nil {
-		return fmt.Errorf("unable to read vsftpd.conf: %s", err.Error())
-	}
-
 	ftpOpts := map[string]string{}
 	if prompts.Confirm("Would you like to allow anonymous users?") {
 		ftpOpts["anonymous_enable"] = "YES"
@@ -121,30 +122,7 @@ func (s *ServiceConfiguration) configureFTP() error {
 		RunCommand("ufw allow " + minPort + ":" + maxPort + "/tcp")
 	}
 
-	lines := strings.Split(string(buffer), "\n")
-	for i, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		cOpt := strings.ReplaceAll(strings.Split(line, "=")[0], "#", "")
-		if newVal, ok := ftpOpts[cOpt]; ok {
-			lines[i] = fmt.Sprintf("%s=%s", cOpt, newVal)
-			delete(ftpOpts, cOpt)
-		}
-	}
-
-	// Add any new options that were not already in the config file.
-	for opt, val := range ftpOpts {
-		lines = append(lines, opt+"="+val)
-	}
-
-	if err := os.WriteFile("/etc/vsftpd.conf", []byte(strings.Join(lines, "\n")), 0644); err != nil {
-		return fmt.Errorf("unable to write vsftpd.conf: %s", err.Error())
-	}
-	logger.Info("Data written to vsftpd.conf")
-
-	return nil
+	return utils.WriteOptsToFile(ftpOpts, " = ", "/etc/vsftpd.conf")
 }
 
 func (s *ServiceConfiguration) configureSSH() error {
@@ -160,11 +138,6 @@ func (s *ServiceConfiguration) configureSSH() error {
 
 	if err := RunCommand("ufw allow openssh"); err != nil {
 		return fmt.Errorf("unable to allow ssh through firewall: %s", err.Error())
-	}
-
-	buffer, err := os.ReadFile("/etc/ssh/sshd_config")
-	if err != nil {
-		return fmt.Errorf("unable to read sshd_config: %s", err.Error())
 	}
 
 	sshOpts := map[string]string{}
@@ -184,43 +157,34 @@ func (s *ServiceConfiguration) configureSSH() error {
 		sshOpts["Port"] = res
 	}
 
-	if len(sshOpts) == 0 {
+	return utils.WriteOptsToFile(sshOpts, " ", "/etc/ssh/sshd_config")
+}
+
+func (s *ServiceConfiguration) configureApache() error {
+	c, err := s.initService("apache2")
+	if err != nil {
+		return fmt.Errorf("unable to initialize apache2 service: %s", err.Error())
+	}
+
+	if !c {
 		return nil
 	}
 
-	lines := strings.Split(string(buffer), "\n")
-	for i, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		split := strings.Split(line, " ")
-		if len(split) < 2 {
-			continue
-		}
-
-		key := strings.ReplaceAll(split[0], "#", "")
-		if _, ok := sshOpts[key]; !ok {
-			continue
-		}
-
-		lines[i] = fmt.Sprintf("%s %s", key, sshOpts[key])
-		delete(sshOpts, key)
+	// Allow Apache through the firewall.
+	if err := RunCommand("ufw allow \"Apache Secure\""); err != nil {
+		return fmt.Errorf("unable to allow apache2 through firewall: %s", err.Error())
 	}
 
-	for opt, val := range sshOpts {
-		lines = append(lines, fmt.Sprintf("%s %s", opt, val))
+	apacheOpts := map[string]string{}
+	if prompts.Confirm("Would you like to set Apache's response header to prod?") {
+		apacheOpts["ServerTokens"] = "Prod"
 	}
 
-	if err := os.WriteFile("/etc/ssh/sshd_config", []byte(strings.Join(lines, "\n")), 0644); err != nil {
-		return fmt.Errorf("unable to write sshd_config: %s", err.Error())
-	}
-	logger.Info("Data written to sshd_config")
-
-	if prompts.Confirm("Would you like to restart the SSH service?") {
-		RunCommand("systemctl restart sshd")
-		logger.Info("SSH service restarted")
+	if prompts.Confirm("Would you like to disable Apache's server signature?") {
+		apacheOpts["ServerSignature"] = "Off"
+	} else {
+		apacheOpts["ServerSignature"] = "On"
 	}
 
-	return nil
+	return utils.WriteOptsToFile(apacheOpts, " ", "/etc/apache2/conf-enabled/security.conf")
 }

@@ -1,11 +1,8 @@
 package script
 
 import (
-	"fmt"
-	"os"
-	"strings"
-
 	"github.com/ethaniccc/simple-osharden/prompts"
+	"github.com/ethaniccc/simple-osharden/utils"
 )
 
 func init() {
@@ -57,76 +54,9 @@ func (s *PasswordSetup) Run() error {
 		pwQualityOpts["usercheck"] = "0"
 	}
 
-	// Update /etc/login.defs
-	buffer, err := os.ReadFile("/etc/login.defs")
-	if err != nil {
-		return fmt.Errorf("unable to read /etc/login.defs: %s", err.Error())
+	if err := utils.WriteOptsToFile(loginDefOpts, " ", "/etc/login.defs"); err != nil {
+		return err
 	}
 
-	// Go through each line on the file and search for options that we want to change.
-	lines := strings.Split(string(buffer), "\n")
-	for i, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		line := strings.ReplaceAll(line, "#", "")
-		split := strings.Split(line, " ")
-		if len(split) < 2 {
-			continue
-		}
-
-		if newVal, ok := loginDefOpts[split[0]]; ok {
-			lines[i] = fmt.Sprintf("%s %s", split[0], newVal)
-			delete(loginDefOpts, split[0])
-		}
-	}
-
-	// Add any missing options not set because they do not exist on the config.
-	for opt, val := range loginDefOpts {
-		lines = append(lines, fmt.Sprintf("%s %s", opt, val))
-	}
-
-	// Write to /etc/login.defs
-	if err := os.WriteFile("/etc/login.defs", []byte(strings.Join(lines, "\n")), 0644); err != nil {
-		return fmt.Errorf("unable to write to /etc/login.defs: %s", err.Error())
-	}
-	logger.Info("Updated /etc/login.defs")
-
-	buffer, err = os.ReadFile("/etc/security/pwquality.conf")
-	if err != nil {
-		return fmt.Errorf("unable to read /etc/security/pwquality.conf: %s", err.Error())
-	}
-
-	// Go through each line on the file and search for options that we want to change.
-	lines = strings.Split(string(buffer), "\n")
-	for i, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		line := strings.ReplaceAll(line, "#", "")
-		split := strings.Split(line, "=")
-		if len(split) < 2 {
-			continue
-		}
-
-		if newVal, ok := pwQualityOpts[strings.TrimSpace(split[0])]; ok {
-			lines[i] = fmt.Sprintf("%s = %s", split[0], newVal)
-			delete(pwQualityOpts, strings.TrimSpace(split[0]))
-		}
-	}
-
-	// Add any missing options not set because they do not exist on the config.
-	for opt, val := range pwQualityOpts {
-		lines = append(lines, fmt.Sprintf("%s = %s", opt, val))
-	}
-
-	// Write to /etc/security/pwquality.conf
-	if err := os.WriteFile("/etc/security/pwquality.conf", []byte(strings.Join(lines, "\n")), 0644); err != nil {
-		return fmt.Errorf("unable to write to /etc/security/pwquality.conf: %s", err.Error())
-	}
-	logger.Info("Updated /etc/security/pwquality.conf")
-
-	return nil
+	return utils.WriteOptsToFile(pwQualityOpts, "=", "/etc/security/pwquality.conf")
 }
