@@ -81,10 +81,6 @@ func (s *NetworkSetup) Run() error {
 	if prompts.Confirm("Would you like to disable IPv6?") {
 		networkOpts["net.ipv6.conf.all.disable_ipv6"] = "1"
 		networkOpts["net.ipv6.conf.default.disable_ipv6"] = "1"
-
-		if err := RunCommand("ufw disable ipv6"); err != nil {
-			return fmt.Errorf("unable to disable IPv6 in UFW: %s", err.Error())
-		}
 	}
 
 	lines := strings.Split(data, "\n")
