@@ -49,6 +49,7 @@ func (s *ServiceConfiguration) initService(service string) (bool, error) {
 	}
 
 	RunCommand("systemctl enable " + service)
+	RunCommand("systemctl start " + service)
 	res, err := GetCommandOutput("systemctl status " + service)
 	if err != nil {
 		return false, fmt.Errorf("unable to get status of %s: %s", service, err.Error())
