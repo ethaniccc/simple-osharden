@@ -10,6 +10,8 @@ func init() {
 	RegisterScript(&NetworkSetup{})
 	RegisterScript(&UpdateDNS{})
 	RegisterScript(&NetApps{})
+
+	RegisterScript(&SystemConfig{})
 }
 
 type Script interface {
