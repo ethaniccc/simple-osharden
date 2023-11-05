@@ -121,11 +121,7 @@ func (s *ServiceConfiguration) configureFTP() error {
 			continue
 		}
 
-		if strings.HasPrefix(line, "#") {
-			continue
-		}
-
-		cOpt := strings.Split(line, "=")[0]
+		cOpt := strings.ReplaceAll(strings.Split(line, "=")[0], "#", "")
 		if newVal, ok := ftpOpts[cOpt]; ok {
 			lines[i] = fmt.Sprintf("%s=%s", cOpt, newVal)
 			delete(ftpOpts, cOpt)
@@ -192,16 +188,12 @@ func (s *ServiceConfiguration) configureSSH() error {
 			continue
 		}
 
-		if strings.HasPrefix(line, "#") {
-			continue
-		}
-
 		split := strings.Split(line, " ")
 		if len(split) < 2 {
 			continue
 		}
 
-		key := split[0]
+		key := strings.ReplaceAll(split[0], "#", "")
 		if _, ok := sshOpts[key]; !ok {
 			continue
 		}

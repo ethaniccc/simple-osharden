@@ -93,12 +93,8 @@ func (s *NetworkSetup) Run() error {
 			continue
 		}
 
-		if strings.HasPrefix(line, "#") {
-			continue
-		}
-
 		// The current option on the line.
-		cOpt := strings.Split(strings.ReplaceAll(line, " ", ""), "=")[0]
+		cOpt := strings.ReplaceAll(strings.Split(strings.ReplaceAll(line, " ", ""), "=")[0], "#", "")
 		if newVal, ok := networkOpts[cOpt]; ok {
 			lines[i] = cOpt + " = " + newVal
 			delete(networkOpts, cOpt)
