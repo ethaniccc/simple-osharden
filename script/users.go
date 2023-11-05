@@ -46,18 +46,23 @@ func (s *AllowedUsers) Run() error {
 				return fmt.Errorf("unable to get groups for user %s: %s", user, err.Error())
 			}
 
-			// Check if any of the groups are sudo.
-			if !strings.Contains(groups, "sudo") {
-				continue
-			}
+			hasAdmin := strings.Contains(groups, "sudo")
 
 			// Ask if this user is an administrator.
 			if prompts.Confirm(fmt.Sprintf("Is the user %s an admin?", user)) {
+				if !hasAdmin {
+					logger.Warnf("Adding %s to sudoers", user)
+					RunCommand(fmt.Sprintf("adduser %s sudo", user))
+				}
+
 				continue
 			}
 
-			if err := RunCommand(fmt.Sprintf("deluser %s sudo", user)); err != nil {
-				return fmt.Errorf("unable to add user %s to sudo group: %s", user, err.Error())
+			// If the user shouldn't be an admin, remove their sudo access if they have it.
+			if hasAdmin {
+				logger.Warnf("Removing %s from sudoers", user)
+				RunCommand(fmt.Sprintf("deluser %s sudo", user))
+				continue
 			}
 
 			continue
