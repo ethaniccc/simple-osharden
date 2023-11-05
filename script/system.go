@@ -6,18 +6,18 @@ import (
 	"strings"
 )
 
-type SystemConfig struct {
+type SystemConfiguration struct {
 }
 
-func (s *SystemConfig) Name() string {
+func (s *SystemConfiguration) Name() string {
 	return "syscfg"
 }
 
-func (s *SystemConfig) Description() string {
+func (s *SystemConfiguration) Description() string {
 	return "Configures settings in sysctl.conf to secure the system."
 }
 
-func (s *SystemConfig) Run() error {
+func (s *SystemConfiguration) Run() error {
 	buffer, err := os.ReadFile("/etc/sysctl.conf")
 	if err != nil {
 		return fmt.Errorf("unable to open /etc/sysctl.conf: %s", err.Error())
@@ -29,6 +29,10 @@ func (s *SystemConfig) Run() error {
 		"kernel.randomize_va_space": "2",
 		"kernel.exec-shield":        "1",
 	}
+
+	logger.Info("Set fs.suid_dumpable to 0")
+	logger.Info("Set kernel.randomize_va_space to 2")
+	logger.Info("Set kernel.exec-shield to 1")
 
 	lines := strings.Split(data, "\n")
 	for i, line := range lines {

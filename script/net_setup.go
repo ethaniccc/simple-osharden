@@ -10,7 +10,7 @@ import (
 )
 
 // NetworkSetup is a script that installs and enables UFW, and sets other network settings.
-// By default, it allows SSH connections, and rejects all other incoming connections.
+// By default, it allows SSH connections, and denies all other incoming connections.
 // All outgoing connections are allowed by default.
 type NetworkSetup struct {
 }
@@ -27,8 +27,8 @@ func (s *NetworkSetup) Run() error {
 	if err := ExecuteLoggedCommands([]LoggedCommand{
 		{"Installing UFW", "apt install ufw", true},
 		{"Enabling UFW Firewall", "ufw enable", false},
-		{"Allowing SSH through firewall", "ufw allow ssh", false},
-		{"Setting option to reject incoming connections by default", "ufw default reject incoming", false},
+		{"Allowing SSH through firewall", "ufw allow openssh", false},
+		{"Setting option to deny incoming connections by default", "ufw default deny incoming", false},
 		{"Setting option to allow outgoing connections by default", "ufw default allow outgoing", false},
 	}); err != nil {
 		return err
@@ -89,6 +89,10 @@ func (s *NetworkSetup) Run() error {
 
 	lines := strings.Split(data, "\n")
 	for i, line := range lines {
+		if line == "" {
+			continue
+		}
+
 		if strings.HasPrefix(line, "#") {
 			continue
 		}

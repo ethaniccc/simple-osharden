@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"runtime"
@@ -60,7 +61,33 @@ func main() {
 }
 
 func mainPrompt() string {
-	return prompt.Input("Enter a command: ", func(d prompt.Document) []prompt.Suggest {
+	msg := `
+███████╗██╗███╗   ███╗██████╗ ██╗     ███████╗     ██████╗ ███████╗██╗  ██╗ █████╗ ██████╗ ██████╗ ███████╗███╗   ██╗
+██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝    ██╔═══██╗██╔════╝██║  ██║██╔══██╗██╔══██╗██╔══██╗██╔════╝████╗  ██║
+███████╗██║██╔████╔██║██████╔╝██║     █████╗█████╗██║   ██║███████╗███████║███████║██████╔╝██║  ██║█████╗  ██╔██╗ ██║
+╚════██║██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝╚════╝██║   ██║╚════██║██╔══██║██╔══██║██╔══██╗██║  ██║██╔══╝  ██║╚██╗██║
+███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗    ╚██████╔╝███████║██║  ██║██║  ██║██║  ██║██████╔╝███████╗██║ ╚████║
+╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝     ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═══╝
+																																										
+- @ethaniccc / benjamin s.												
+
+Simple-OSHarden is a tool that can be used to harden your machine. 
+As of Nov. 4, 2023, this tool is in beta, and only supports linux.
+
+As a student, I aspire to learn more about cybersecurity, and this
+is one of my first projects relating to it. If there's any issues
+or suggestions you'd like to report, please do so on the Github
+repository. You're the best!
+
+If for any reason, you'd like to contact me, please send an email
+to benjaminscyber@skiff.com. I'll try to respond as soon as I can.
+
+Github: https://www.github.com/ethaniccc/
+Source code: https://github.com/ethaniccc/simple-osharden
+`
+
+	fmt.Println(msg)
+	return prompt.Input("Enter a command >> ", func(d prompt.Document) []prompt.Suggest {
 		list := []prompt.Suggest{
 			{Text: "exit", Description: "Quit Simple-OSHarden."},
 			{Text: "reboot", Description: "Reboot the machine."},

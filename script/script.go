@@ -11,7 +11,8 @@ func init() {
 	RegisterScript(&UpdateDNS{})
 	RegisterScript(&NetApps{})
 
-	RegisterScript(&SystemConfig{})
+	RegisterScript(&SystemConfiguration{})
+	RegisterScript(&ServiceConfiguration{})
 	RegisterScript(&RemovePrograms{})
 }
 
