@@ -56,7 +56,8 @@ func (s *ServiceConfiguration) initService(service string) (bool, error) {
 	RunCommand("systemctl start " + service)
 	res, err := GetCommandOutput("systemctl status " + service)
 	if err != nil {
-		return false, fmt.Errorf("unable to get status of %s: %s", service, err.Error())
+		logger.Warnf("unable to get status of %s: it is possible the service does not exist on this machine", service)
+		return false, nil
 	}
 
 	if !strings.Contains(res, "active (running)") {
