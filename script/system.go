@@ -40,7 +40,7 @@ func (s *SystemConfiguration) Run() error {
 
 	lines := strings.Split(data, "\n")
 	for i, line := range lines {
-		cOpt := strings.ReplaceAll(strings.Split(strings.ReplaceAll(line, " ", ""), "=")[0], "#", "")
+		cOpt := strings.ReplaceAll(strings.Split(strings.TrimSpace(line), "=")[0], "#", "")
 		if newVal, ok := options[cOpt]; ok {
 			lines[i] = cOpt + " = " + newVal
 			delete(options, cOpt)

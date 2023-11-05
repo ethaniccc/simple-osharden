@@ -19,6 +19,16 @@ func RawResponsePrompt(msg string) string {
 	return prompt.Input(msg+" >> ", DummyPromptCompletor, DummyPromptOption)
 }
 
+// RawResponseWithDefaultPrompt prompts the user, and if the response is empty, returns the default.
+func RawResponseWithDefaultPrompt(msg, def string) string {
+	res := RawResponsePrompt(msg)
+	if res == "" {
+		return def
+	}
+
+	return res
+}
+
 // Confirm returns true if the user selected yes, and false if the user selected no.
 func Confirm(msg string) bool {
 	switch strings.ToLower(RawResponsePrompt(msg + " (y/n)")) {

@@ -72,9 +72,10 @@ func mainPrompt() string {
  _____ _____ _____           _         
 |     |   __|  |  |___ ___ _| |___ ___ 
 |  |  |__   |     | .'|  _| . | -_|   |
-|_____|_____|__|__|__,|_| |___|___|_|_|																																										
+|_____|_____|__|__|__,|_| |___|___|_|_|			
+																																							
 - @ethaniccc						
-						
+
 
 Simple-OSHarden is a tool that can be used to harden your machine. 
 As of Nov. 4, 2023, this tool is in beta, and only supports linux.

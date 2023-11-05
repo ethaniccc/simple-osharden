@@ -37,11 +37,14 @@ func (s *NetApps) Run() error {
 		if len(fields) < 7 {
 			continue
 		}
-		RunCommand("reset")
 
 		// Parse each line from the data given by netstat.
 		ip := fields[3]
 		split := strings.Split(fields[6], "/")
+		if len(split) != 2 {
+			continue
+		}
+
 		pid, proc := split[0], strings.Split(strings.Split(split[1], " ")[0], ":")[0]
 
 		if prompts.Confirm(fmt.Sprintf("Should the process %s (pid=%s) be listening on %s", proc, pid, ip)) {
@@ -77,6 +80,7 @@ func (s *NetApps) Run() error {
 // uninstall will uninstall the program and remove any traces of it.
 func (s *NetApps) uninstall(program string) error {
 	// Uninstall the program.
+	RunCommand("reset")
 	RunCommand(fmt.Sprintf("apt purge %s", program))
 
 	// Find any traces of the program and remove them.

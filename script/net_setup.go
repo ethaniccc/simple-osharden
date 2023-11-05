@@ -94,7 +94,7 @@ func (s *NetworkSetup) Run() error {
 		}
 
 		// The current option on the line.
-		cOpt := strings.ReplaceAll(strings.Split(strings.ReplaceAll(line, " ", ""), "=")[0], "#", "")
+		cOpt := strings.ReplaceAll(strings.Split(strings.TrimSpace(line), "=")[0], "#", "")
 		if newVal, ok := networkOpts[cOpt]; ok {
 			lines[i] = cOpt + " = " + newVal
 			delete(networkOpts, cOpt)
