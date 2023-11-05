@@ -3,6 +3,7 @@ package script
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
@@ -32,7 +33,7 @@ func (s *AllowedUsers) Run() error {
 		return fmt.Errorf("unable to scan /home: %s", err.Error())
 	}
 
-	// Iterate through each entry in the directory.
+	// Iterate through each entry in the /home/ directory.
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -40,6 +41,25 @@ func (s *AllowedUsers) Run() error {
 
 		user := entry.Name()
 		if prompts.Confirm(fmt.Sprintf("Is the user %s allowed on this machine?", user)) {
+			groups, err := GetCommandOutput(fmt.Sprintf("groups %s", user))
+			if err != nil {
+				return fmt.Errorf("unable to get groups for user %s: %s", user, err.Error())
+			}
+
+			// Check if any of the groups are sudo.
+			if !strings.Contains(groups, "sudo") {
+				continue
+			}
+
+			// Ask if this user is an administrator.
+			if prompts.Confirm(fmt.Sprintf("Is the user %s an admin?", user)) {
+				continue
+			}
+
+			if err := RunCommand(fmt.Sprintf("deluser %s sudo", user)); err != nil {
+				return fmt.Errorf("unable to add user %s to sudo group: %s", user, err.Error())
+			}
+
 			continue
 		}
 
