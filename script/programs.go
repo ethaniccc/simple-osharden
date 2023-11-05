@@ -4,6 +4,7 @@ import "github.com/ethaniccc/simple-osharden/prompts"
 
 func init() {
 	RegisterScript(&RemovePrograms{})
+	RegisterScript(&UpdatePrograms{})
 }
 
 type RemovePrograms struct {
@@ -84,4 +85,21 @@ func (s *RemovePrograms) Run() error {
 
 	RunCommand("reset")
 	return ExecuteLoggedCommands(commands)
+}
+
+// UpdatePrograms is a script that updates programs on the system. This is a very simple script
+// that essentially only runs `apt upgrade`.
+type UpdatePrograms struct {
+}
+
+func (s *UpdatePrograms) Name() string {
+	return "programs-update"
+}
+
+func (s *UpdatePrograms) Description() string {
+	return "Updates programs on the system."
+}
+
+func (s *UpdatePrograms) Run() error {
+	return RunCommand("apt upgrade")
 }
