@@ -15,6 +15,12 @@ import (
 
 var log *logrus.Logger
 
+var list = []prompt.Suggest{
+	{Text: "help", Description: "Display a list of commands."},
+	{Text: "reboot", Description: "Reboot the machine."},
+	{Text: "exit", Description: "Quit Simple-OSHarden."},
+}
+
 func main() {
 	if runtime.GOOS != "linux" {
 		log.Fatal("This program is only supported on Linux.")
@@ -31,6 +37,14 @@ func main() {
 	log.Info("Updating repositories...")
 	script.RunCommand("apt update")
 	script.RunCommand("reset")
+
+	log.Info("Loading scripts...")
+	for _, s := range script.AvailableScripts() {
+		list = append(list, prompt.Suggest{
+			Text:        s.Name(),
+			Description: s.Description(),
+		})
+	}
 
 	for {
 		script.RunCommand("reset")
@@ -90,19 +104,6 @@ Source code: https://github.com/ethaniccc/simple-osharden
 
 	fmt.Println(msg)
 	return prompt.Input("Enter a command >> ", func(d prompt.Document) []prompt.Suggest {
-		list := []prompt.Suggest{
-			{Text: "help", Description: "Display a list of commands."},
-			{Text: "reboot", Description: "Reboot the machine."},
-			{Text: "exit", Description: "Quit Simple-OSHarden."},
-		}
-
-		for _, s := range script.AvailableScripts() {
-			list = append(list, prompt.Suggest{
-				Text:        s.Name(),
-				Description: s.Description(),
-			})
-		}
-
 		return prompt.FilterHasPrefix(list, d.GetWordBeforeCursor(), true)
 	}, prompt.OptionMaxSuggestion(16))
 }
