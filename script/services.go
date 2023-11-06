@@ -171,7 +171,7 @@ func (s *ServiceConfiguration) configureApache() error {
 	}
 
 	// Allow Apache through the firewall.
-	if err := RunCommand("ufw allow \"Apache Secure\""); err != nil {
+	if err := RunCommand("ufw allow 'Apache Secure'"); err != nil {
 		return fmt.Errorf("unable to allow apache2 through firewall: %s", err.Error())
 	}
 
