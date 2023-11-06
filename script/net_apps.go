@@ -19,7 +19,7 @@ type NetApps struct {
 }
 
 func (s *NetApps) Name() string {
-	return "net-apps"
+	return "netapps"
 }
 
 func (s *NetApps) Description() string {
@@ -69,7 +69,7 @@ func (s *NetApps) RunOnLinux() error {
 		}
 	}
 
-	RunCommand("reset")
+	ResetTerminal()
 	if err := RunCommand("apt autoremove"); err != nil {
 		return fmt.Errorf("unable to autoremove packages: %s", err.Error())
 	}
@@ -80,7 +80,7 @@ func (s *NetApps) RunOnLinux() error {
 // uninstall will uninstall the program and remove any traces of it.
 func (s *NetApps) uninstall(program string) error {
 	// Uninstall the program.
-	RunCommand("reset")
+	ResetTerminal()
 	RunCommand(fmt.Sprintf("apt purge %s", program))
 
 	// Find any traces of the program and remove them.

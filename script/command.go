@@ -1,8 +1,10 @@
 package script
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/ethaniccc/simple-osharden/prompts"
@@ -71,4 +73,14 @@ func ConfirmCommand(msg, c string) error {
 	}
 
 	return RunCommand(c)
+}
+
+// ResetTerminal resets the terminal.
+func ResetTerminal() {
+	if runtime.GOOS == "windows" {
+		fmt.Print("\033[H\033[2J") // Github Copilot ftw???
+		return
+	}
+
+	RunCommand("reset")
 }

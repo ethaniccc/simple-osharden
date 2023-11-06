@@ -13,7 +13,7 @@ type PasswordSetup struct {
 }
 
 func (s *PasswordSetup) Name() string {
-	return "pwd-setup"
+	return "pwdsetup"
 }
 
 func (s *PasswordSetup) Description() string {

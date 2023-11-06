@@ -32,7 +32,7 @@ func main() {
 
 	log.Info("Updating repositories...")
 	script.RunCommand("apt update")
-	script.RunCommand("reset")
+	script.ResetTerminal()
 
 	// Load all the available scripts into the prompt suggestion list.
 	log.Info("Loading scripts...")
@@ -55,12 +55,12 @@ func main() {
 
 	// Run the main prompt.
 	for {
-		script.RunCommand("reset")
+		script.ResetTerminal()
 		res := mainPrompt()
 
 		// Hardcode commands because I am very very very very very lazy :)
 		if res == "exit" {
-			script.RunCommand("reset")
+			script.ResetTerminal()
 			return
 		} else if res == "reboot" {
 			if runtime.GOOS == "windows" {
@@ -140,7 +140,7 @@ func handleInterrupt() {
 
 	<-sigchan
 
-	script.RunCommand("reset")
+	script.ResetTerminal()
 	os.Exit(1)
 }
 

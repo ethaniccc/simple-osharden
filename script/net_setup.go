@@ -18,7 +18,7 @@ type NetworkSetup struct {
 }
 
 func (s *NetworkSetup) Name() string {
-	return "net-setup"
+	return "netsetup"
 }
 
 func (s *NetworkSetup) Description() string {

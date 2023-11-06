@@ -9,24 +9,24 @@ import (
 )
 
 func init() {
-	RegisterScript(&AllowedUsers{})
+	RegisterScript(&VerifyUsers{})
 }
 
-// AllowedUsers is a script that goes through every user on the machine, and prompts the
+// VerifyUsers is a script that goes through every user on the machine, and prompts the
 // user to verify that they should be on the machine. If the user is not allowed, they
 // will be removed from the machine.
-type AllowedUsers struct {
+type VerifyUsers struct {
 }
 
-func (s *AllowedUsers) Name() string {
-	return "users-allowed"
+func (s *VerifyUsers) Name() string {
+	return "usersverify"
 }
 
-func (s *AllowedUsers) Description() string {
+func (s *VerifyUsers) Description() string {
 	return "Verify all users are allowed on the machine."
 }
 
-func (s *AllowedUsers) RunOnLinux() error {
+func (s *VerifyUsers) RunOnLinux() error {
 	// Scan the home directory.
 	entries, err := os.ReadDir("/home")
 	if err != nil {

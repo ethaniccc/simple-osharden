@@ -11,7 +11,7 @@ type RemovePrograms struct {
 }
 
 func (s *RemovePrograms) Name() string {
-	return "programs-rm"
+	return "rmprograms"
 }
 
 func (s *RemovePrograms) Description() string {
@@ -83,7 +83,7 @@ func (s *RemovePrograms) RunOnLinux() error {
 		IgnoreErr:  true,
 	})
 
-	RunCommand("reset")
+	ResetTerminal()
 	return ExecuteLoggedCommands(commands)
 }
 

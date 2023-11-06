@@ -11,6 +11,7 @@ import (
 
 func init() {
 	RegisterScript(&UpdateDNS{})
+	RegisterScript(&FlushDNS{})
 }
 
 // UpdateDNS is a script that checks for the current DNS servers. The user is then able
@@ -20,7 +21,7 @@ type UpdateDNS struct {
 }
 
 func (s *UpdateDNS) Name() string {
-	return "dns-update"
+	return "dnsupdate"
 }
 
 func (s *UpdateDNS) Description() string {
@@ -84,6 +85,34 @@ func (s *UpdateDNS) RunOnLinux() error {
 
 	if err := os.WriteFile(file, []byte(data), 0644); err != nil {
 		return fmt.Errorf("unable to write /etc/resolv.conf: %s", err.Error())
+	}
+
+	return nil
+}
+
+// FlushDNS is a script that flushes the DNS cache.
+type FlushDNS struct {
+}
+
+func (s *FlushDNS) Name() string {
+	return "dnsflush"
+}
+
+func (s *FlushDNS) Description() string {
+	return "Flushes the DNS cache."
+}
+
+func (s *FlushDNS) RunOnLinux() error {
+	if err := RunCommand("systemctl restart systemd-resolved"); err != nil {
+		return fmt.Errorf("unable to restart systemd-resolved: %s", err.Error())
+	}
+
+	return nil
+}
+
+func (s *FlushDNS) RunOnWindows() error {
+	if err := RunCommand("ipconfig /flushdns"); err != nil {
+		return fmt.Errorf("unable to flush DNS: %s", err.Error())
 	}
 
 	return nil
