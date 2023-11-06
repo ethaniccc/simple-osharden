@@ -20,7 +20,7 @@ func (s *PasswordSetup) Description() string {
 	return "Setup the password policy for the machine."
 }
 
-func (s *PasswordSetup) Run() error {
+func (s *PasswordSetup) RunOnLinux() error {
 	loginDefOpts := map[string]string{}
 	pwQualityOpts := map[string]string{}
 

@@ -23,7 +23,7 @@ func (s *ServiceConfiguration) Description() string {
 	return "Configures services to be more secure."
 }
 
-func (s *ServiceConfiguration) Run() error {
+func (s *ServiceConfiguration) RunOnLinux() error {
 	if prompts.Confirm("Would you like to configure SSH?") {
 		if err := s.configureSSH(); err != nil {
 			return err

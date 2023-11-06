@@ -18,7 +18,7 @@ func (s *RemovePrograms) Description() string {
 	return "Removes programs that may increase the attack surface of the system."
 }
 
-func (s *RemovePrograms) Run() error {
+func (s *RemovePrograms) RunOnLinux() error {
 	commands := []LoggedCommand{}
 
 	if prompts.Confirm("Would you like to uninstall wireshark?") {
@@ -100,6 +100,6 @@ func (s *UpdatePrograms) Description() string {
 	return "Updates programs on the system."
 }
 
-func (s *UpdatePrograms) Run() error {
+func (s *UpdatePrograms) RunOnLinux() error {
 	return RunCommand("apt upgrade")
 }

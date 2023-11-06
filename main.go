@@ -15,19 +15,15 @@ import (
 
 var log *logrus.Logger
 
-var list = []prompt.Suggest{
-	{Text: "help", Description: "Display a list of commands."},
-	{Text: "reboot", Description: "Reboot the machine."},
-	{Text: "exit", Description: "Quit Simple-OSHarden."},
-}
+var list []prompt.Suggest
 
 func main() {
-	if runtime.GOOS != "linux" {
-		log.Fatal("This program is only supported on Linux.")
-	}
-
-	// Run the inital prompt.
 	log = logrus.New()
+
+	if runtime.GOOS != "windows" && runtime.GOOS != "linux" {
+		log.Fatal("Simple-OSHarden is currently only supported on Windows and Linux.")
+		return
+	}
 
 	// Make sure the user running this script is an admin.
 	adminCheck()
@@ -38,26 +34,56 @@ func main() {
 	script.RunCommand("apt update")
 	script.RunCommand("reset")
 
+	// Load all the available scripts into the prompt suggestion list.
 	log.Info("Loading scripts...")
-	for _, s := range script.AvailableScripts() {
-		list = append(list, prompt.Suggest{
-			Text:        s.Name(),
-			Description: s.Description(),
-		})
+	list = []prompt.Suggest{
+		{Text: "help", Description: "Display a list of commands."},
+		{Text: "reboot", Description: "Reboot the machine."},
+		{Text: "exit", Description: "Quit Simple-OSHarden."},
 	}
 
+	scripts := map[string]script.Script{}
+	if runtime.GOOS == "windows" {
+		scripts = script.AvailableWindowsScripts()
+	} else if runtime.GOOS == "linux" {
+		scripts = script.AvailableLinuxScripts()
+	}
+
+	for _, s := range scripts {
+		list = append(list, prompt.Suggest{Text: s.Name(), Description: s.Description()})
+	}
+
+	// Run the main prompt.
 	for {
 		script.RunCommand("reset")
 		res := mainPrompt()
+
+		// Hardcode commands because I am very very very very very lazy :)
 		if res == "exit" {
 			script.RunCommand("reset")
 			return
 		} else if res == "reboot" {
-			script.RunCommand("shutdown -r 0")
+			if runtime.GOOS == "windows" {
+				script.RunCommand("shutdown /r /t 0")
+			} else if runtime.GOOS == "linux" {
+				script.RunCommand("shutdown -r 0")
+			}
+
 			return
 		} else if res == "help" {
-			for _, s := range script.AvailableScripts() {
-				log.Infof("%s - %s\n", s.Name(), s.Description())
+			scripts := map[string]script.Script{}
+			if runtime.GOOS == "windows" {
+				scripts = script.AvailableWindowsScripts()
+			} else if runtime.GOOS == "linux" {
+				scripts = script.AvailableLinuxScripts()
+			}
+
+			if len(scripts) == 0 {
+				log.Error("At the moment, no scripts are supported on your operating system.")
+			} else {
+				for _, s := range scripts {
+					log.Infof("%s - %s\n", s.Name(), s.Description())
+				}
 			}
 
 			prompts.RawResponsePrompt("Press enter to continue")
@@ -71,13 +97,13 @@ func main() {
 			continue
 		}
 
-		script.RunCommand("reset")
-		if err := s.Run(); err != nil {
-			log.Errorf("Error running script: %s", err.Error())
+		// Run the script
+		if err := script.RunScript(s); err != nil {
+			prompts.RawResponsePrompt(fmt.Sprintf("The script failed to run due to an error: %s\n[Press enter to continue]", err.Error()))
 		} else {
-			log.Info("The script ran successfully! Returning to main menu in 3 seconds...")
+			prompts.RawResponsePrompt("Script finished running successfully\n[Press enter to continue]")
 		}
-		<-time.After(time.Second * 3)
+
 		runtime.GC()
 	}
 }
@@ -119,7 +145,17 @@ func handleInterrupt() {
 }
 
 func adminCheck() {
-	if os.Getuid() != 0 {
-		log.Fatal("This program must be run as root.")
+	switch runtime.GOOS {
+	case "windows":
+		f, err := os.Open("\\\\.\\PHYSICALDRIVE0")
+		if err != nil {
+			log.Fatal("You must run this script as an administrator.")
+			return
+		}
+		f.Close()
+	case "linux":
+		if os.Geteuid() != 0 {
+			log.Fatal("You must run this script as an administrator.")
+		}
 	}
 }

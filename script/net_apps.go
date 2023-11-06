@@ -26,7 +26,7 @@ func (s *NetApps) Description() string {
 	return "Checks for any applications that are listening on ports."
 }
 
-func (s *NetApps) Run() error {
+func (s *NetApps) RunOnLinux() error {
 	output, err := GetCommandOutput("netstat -tunlpw")
 	if err != nil {
 		return fmt.Errorf("unable to get netstat data: %s", err.Error())

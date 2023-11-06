@@ -25,7 +25,7 @@ func (s *NetworkSetup) Description() string {
 	return "Installs and configures firewall, and sets other network settings."
 }
 
-func (s *NetworkSetup) Run() error {
+func (s *NetworkSetup) RunOnLinux() error {
 	if err := ExecuteLoggedCommands([]LoggedCommand{
 		{"Installing UFW", "apt install ufw", true},
 		{"Enabling UFW Firewall", "ufw enable", false},

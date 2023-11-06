@@ -26,7 +26,7 @@ func (s *AllowedUsers) Description() string {
 	return "Verify all users are allowed on the machine."
 }
 
-func (s *AllowedUsers) Run() error {
+func (s *AllowedUsers) RunOnLinux() error {
 	// Scan the home directory.
 	entries, err := os.ReadDir("/home")
 	if err != nil {

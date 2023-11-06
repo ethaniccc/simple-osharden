@@ -18,7 +18,7 @@ func (s *SystemConfiguration) Description() string {
 	return "Configures settings in sysctl.conf to secure the system."
 }
 
-func (s *SystemConfiguration) Run() error {
+func (s *SystemConfiguration) RunOnLinux() error {
 	return utils.WriteOptsToFile(map[string]string{
 		"fs.suid_dumpable":          "0",
 		"kernel.randomize_va_space": "2",
