@@ -42,7 +42,7 @@ func (s *PasswordSetup) Run() error {
 		pwQualityOpts["lcredit"] = "0"
 	}
 
-	if prompts.Confirm("Should the password disctionary check be enabled?") {
+	if prompts.Confirm("Should the password dictionary check be enabled?") {
 		pwQualityOpts["dictcheck"] = "1"
 	} else {
 		pwQualityOpts["dictcheck"] = "0"
