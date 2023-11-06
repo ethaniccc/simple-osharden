@@ -51,6 +51,11 @@ func RunCommand(c string) error {
 	return CreateCommand(split[0], split[1:]...).Run()
 }
 
+// RunCommandWithArgs runs a command with specific arguments.
+func RunCommandWithArgs(c string, args ...string) error {
+	return CreateCommand(c, args...).Run()
+}
+
 // GetCommandOutput runs a command and returns the output.
 func GetCommandOutput(c string) (string, error) {
 	split := strings.Split(c, " ")
