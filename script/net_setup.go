@@ -1,6 +1,7 @@
 package script
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ethaniccc/simple-osharden/prompts"
@@ -87,6 +88,22 @@ func (s *NetworkSetup) RunOnLinux() error {
 	logger.Warnf("For changes to be applied, please restart the machine.")
 	logger.Warnf("--------------- IMPORTANT ---------------")
 	<-time.After(time.Second * 3)
+
+	return nil
+}
+
+func (s *NetworkSetup) RunOnWindows() error {
+	commands := []LoggedCommand{
+		{"Enabling Windows Firewall", "netsh advfirewall set allprofiles state on", false},
+	}
+
+	if prompts.Confirm("Disable inbound connections by default?") {
+		commands = append(commands, LoggedCommand{"Disabling inbound connections by default", "netsh advfirewall set allprofiles firewallpolicy blockinbound,allowoutbound", false})
+	}
+
+	if err := ExecuteLoggedCommands(commands); err != nil {
+		return fmt.Errorf("unable to set up network: %s", err.Error())
+	}
 
 	return nil
 }

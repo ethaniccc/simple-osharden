@@ -64,7 +64,7 @@ func (s *NetApps) RunOnLinux() error {
 			continue
 		}
 
-		if err := s.uninstall(proc); err != nil {
+		if err := s.appUninstallLinux(proc); err != nil {
 			return fmt.Errorf("unable to uninstall program: %s", err.Error())
 		}
 	}
@@ -77,8 +77,8 @@ func (s *NetApps) RunOnLinux() error {
 	return nil
 }
 
-// uninstall will uninstall the program and remove any traces of it.
-func (s *NetApps) uninstall(program string) error {
+// appUninstallLinux will uninstall the program on linux and remove any traces of it.
+func (s *NetApps) appUninstallLinux(program string) error {
 	// Uninstall the program.
 	ResetTerminal()
 	RunCommand(fmt.Sprintf("apt purge %s", program))
