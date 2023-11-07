@@ -44,17 +44,14 @@ func (s *RunAntivirus) RunOnLinux() error {
 
 func (s *RunAntivirus) RunOnWindows() error {
 	var scanType string
-	for {
+	for scanType != "" {
 		switch strings.ToLower(prompts.RawResponsePrompt("What type of scan would you like to run? [Quick, Full, Custom]")) {
 		case "quick":
 			scanType = "QuickScan"
-			break
 		case "full":
 			scanType = "FullScan"
-			break
 		case "custom":
 			scanType = "CustomScan"
-			break
 		default:
 			logger.Errorf("%s is not a valid scan type.", scanType)
 		}
