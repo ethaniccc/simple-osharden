@@ -2,8 +2,8 @@ package script
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/c-bata/go-prompt"
 	"github.com/ethaniccc/simple-osharden/prompts"
 )
 
@@ -33,7 +33,10 @@ func (s *RunAntivirus) RunOnLinux() error {
 
 	// Update the antivirus.
 	if err := RunCommand("freshclam"); err != nil {
-		return fmt.Errorf("unable to update antivirus: %s", err.Error())
+		logger.Errorf("unable to update antivirus definitions")
+		if !prompts.Confirm("Would you still like to continue?") {
+			return nil
+		}
 	}
 
 	ResetTerminal()
@@ -47,18 +50,17 @@ func (s *RunAntivirus) RunOnLinux() error {
 }
 
 func (s *RunAntivirus) RunOnWindows() error {
-	var scanType string
-	for scanType != "" {
-		switch strings.ToLower(prompts.RawResponsePrompt("What type of scan would you like to run? [Quick, Full, Custom]")) {
-		case "quick":
-			scanType = "QuickScan"
-		case "full":
-			scanType = "FullScan"
-		case "custom":
-			scanType = "CustomScan"
-		default:
-			logger.Errorf("%s is not a valid scan type.", scanType)
-		}
+	scanType := prompt.Input("Select scan type: ", func(d prompt.Document) []prompt.Suggest {
+		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "Quick", Description: "Runs a quick antivirus scan."},
+			{Text: "Full", Description: "Runs a full antivirus scan."},
+			{Text: "Custom", Description: "Runs a custom antivirus scan."},
+		}, d.GetWordBeforeCursor(), true)
+	}, prompts.DummyPromptOption)
+	if scanType != "Quick" && scanType != "Full" && scanType != "Custom" {
+		logger.Error("Invalid scan type - please select a valid scan type.")
+		s.RunOnWindows()
+		return nil
 	}
 
 	if err := RunCommand(fmt.Sprintf("powershell.exe -Command \"Start-MpScan -ScanType %s\"", scanType)); err != nil {
