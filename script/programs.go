@@ -93,7 +93,7 @@ type UpdatePrograms struct {
 }
 
 func (s *UpdatePrograms) Name() string {
-	return "programs-update"
+	return "updateprograms"
 }
 
 func (s *UpdatePrograms) Description() string {
@@ -101,5 +101,6 @@ func (s *UpdatePrograms) Description() string {
 }
 
 func (s *UpdatePrograms) RunOnLinux() error {
+	ResetTerminal()
 	return RunCommand("apt upgrade")
 }

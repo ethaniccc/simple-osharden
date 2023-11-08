@@ -85,7 +85,6 @@ func UnregisterScript(name string) {
 
 // RunScript runs a script.
 func RunScript(s Script) error {
-	var runFunc func() error
 	switch runtime.GOOS {
 	case "windows":
 		ws, ok := s.(WindowsSupportedScript)
@@ -93,15 +92,15 @@ func RunScript(s Script) error {
 			return fmt.Errorf("not supported on windows")
 		}
 
-		runFunc = ws.RunOnWindows
+		return ws.RunOnWindows()
 	case "linux":
 		ls, ok := s.(LinuxSupportedScript)
 		if !ok {
 			return fmt.Errorf("not supported on linux")
 		}
 
-		runFunc = ls.RunOnLinux
+		return ls.RunOnLinux()
 	}
 
-	return runFunc()
+	panic("unsupported OS")
 }
