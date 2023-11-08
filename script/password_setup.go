@@ -1,6 +1,9 @@
 package script
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/ethaniccc/simple-osharden/prompts"
 	"github.com/ethaniccc/simple-osharden/utils"
 )
@@ -59,4 +62,41 @@ func (s *PasswordSetup) RunOnLinux() error {
 	}
 
 	return utils.WriteOptsToFile(pwQualityOpts, "=", "/etc/security/pwquality.conf")
+}
+
+func (s *PasswordSetup) RunOnWindows() error {
+	minAge := prompts.RawResponseWithDefaultPrompt("What should the minimum password age be? (recommended is 7)", "7")
+	maxAge := prompts.RawResponseWithDefaultPrompt("What should the maximum password age be? (recommended is 30)", "30")
+	lockThreshold := prompts.RawResponseWithDefaultPrompt("How many failed login attempts should lock the account? (recommended is 3)", "3")
+
+	// Set the password policy.
+	if err := RunCommand(fmt.Sprintf("net accounts /minpwage:%s /maxpwage:%s /lockoutthreshold:%s", minAge, maxAge, lockThreshold)); err != nil {
+		return fmt.Errorf("unable to set pw settings: %s", err.Error())
+	}
+
+	// Export current security policy to a temporary file
+	tmpfile, err := os.CreateTemp("", "secpol")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmpfile.Name())
+
+	if err := RunCommand(fmt.Sprintf("secedit /export /cfg %s", tmpfile.Name())); err != nil {
+		return err
+	}
+
+	pwdOpts := map[string]string{}
+	if prompts.Confirm("Enable password complexity checks?") {
+		pwdOpts["PasswordComplexity"] = "1"
+	} else {
+		pwdOpts["PasswordComplexity"] = "0"
+	}
+	pwdOpts["MinPwdLen"] = prompts.RawResponseWithDefaultPrompt("What should the minimum password length be? (recommended is 8)", "8")
+
+	if err = utils.WriteOptsToFile(pwdOpts, " ", tmpfile.Name()); err != nil {
+		return err
+	}
+
+	// Import the modified security policy from the temporary file
+	return RunCommand("secedit /configure /db secedit.sdb /cfg " + tmpfile.Name() + " /quiet")
 }
