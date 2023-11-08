@@ -38,6 +38,7 @@ func main() {
 	log.Info("Loading scripts...")
 	list = []prompt.Suggest{
 		{Text: "help", Description: "Display a list of commands."},
+		{Text: "execall", Description: "Run all the scripts."},
 		{Text: "reboot", Description: "Reboot the machine."},
 		{Text: "exit", Description: "Quit Simple-OSHarden."},
 	}
@@ -87,6 +88,17 @@ func main() {
 			}
 
 			prompts.RawResponsePrompt("Press enter to continue")
+			continue
+		} else if res == "execall" {
+			for _, s := range scripts {
+				if err := script.RunScript(s); err != nil {
+					log.Errorf("Unable to run script \"%s\": %s", s.Name(), err.Error())
+				}
+				prompts.RawResponsePrompt("Press enter to continue")
+				script.ResetTerminal()
+			}
+
+			prompts.RawResponsePrompt("All scripts finished running successfully\n[Press enter to continue]")
 			continue
 		}
 
