@@ -28,7 +28,7 @@ func (s *PasswordSetup) RunOnLinux() error {
 	pwQualityOpts := map[string]string{}
 
 	loginDefOpts["PASS_MIN_DAYS"] = prompts.RawResponseWithDefaultPrompt("What should the minimum password age be? (recommended is 7)", "7")
-	loginDefOpts["PASS_MAX_DAYS"] = prompts.RawResponseWithDefaultPrompt("What should the maximum password age be? (recommended is 30)", "30")
+	loginDefOpts["PASS_MAX_DAYS"] = prompts.RawResponseWithDefaultPrompt("What should the maximum password age be? (recommended is 90)", "90")
 	loginDefOpts["ENCRYPT_METHOD"] = prompts.RawResponseWithDefaultPrompt("What should the encryption method be? (recommended is SHA512)", "SHA512")
 	loginDefOpts["LOGIN_RETRIES"] = prompts.RawResponseWithDefaultPrompt("How many login retries should be allowed? (recommended is 3)", "3")
 
