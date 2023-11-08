@@ -24,6 +24,8 @@ func (s *RunAntivirus) Description() string {
 }
 
 func (s *RunAntivirus) RunOnLinux() error {
+	ResetTerminal()
+
 	// Install the antivirus.
 	if err := RunCommand("apt install clamav"); err != nil {
 		return fmt.Errorf("unable to install antivirus: %s", err.Error())
@@ -33,6 +35,8 @@ func (s *RunAntivirus) RunOnLinux() error {
 	if err := RunCommand("freshclam"); err != nil {
 		return fmt.Errorf("unable to update antivirus: %s", err.Error())
 	}
+
+	ResetTerminal()
 
 	// Scan the machine.
 	if err := RunCommand("clamscan -r /"); err != nil {
