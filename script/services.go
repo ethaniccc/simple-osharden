@@ -56,6 +56,11 @@ func (s *ServiceConfiguration) initService(service string) (bool, error) {
 		RunCommand("systemctl disable " + service)
 
 		return false, nil
+	} else if err := ExecuteLoggedCommands([]LoggedCommand{
+		{"Enabling " + service, "systemctl enable " + service, false},
+		{"Starting " + service, "systemctl start " + service, false},
+	}); err != nil {
+		return false, err
 	}
 
 	RunCommand("systemctl enable " + service)
