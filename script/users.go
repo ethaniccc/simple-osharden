@@ -10,6 +10,7 @@ import (
 
 func init() {
 	RegisterScript(&VerifyUsers{})
+	RegisterScript(&DisableRoot{})
 }
 
 // VerifyUsers is a script that goes through every user on the machine, and prompts the
@@ -123,5 +124,22 @@ func (s *VerifyUsers) RunOnWindows() error {
 		}
 	}
 
+	return nil
+}
+
+// DisableRoot is a script that disables the root user on the machine.
+type DisableRoot struct {
+}
+
+func (s *DisableRoot) Name() string {
+	return "disableroot"
+}
+
+func (s *DisableRoot) Description() string {
+	return "Disables the root user on the machine."
+}
+
+func (s *DisableRoot) RunOnLinux() error {
+	RunCommand("passwd -l root")
 	return nil
 }
