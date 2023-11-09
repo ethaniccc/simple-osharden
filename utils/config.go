@@ -32,6 +32,37 @@ func CreateTempFileFrom(f string) (*os.File, error) {
 	return tmpFile, nil
 }
 
+// GetOptsFromFile will return the options specified in the given file.
+func GetOptsFromFile(sep string, file string) (map[string]string, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open %s: %s", file, err.Error())
+	}
+
+	buffer, err := io.ReadAll(f)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read %s: %s", file, err.Error())
+	}
+
+	lines := strings.Split(string(buffer), "\n")
+	opts := make(map[string]string)
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+
+		line := strings.ReplaceAll(line, "#", "")
+		split := strings.Split(line, sep)
+		if len(split) < 2 {
+			continue
+		}
+
+		opts[strings.TrimSpace(split[0])] = strings.Join(split[1:], sep)
+	}
+
+	return opts, nil
+}
+
 // WriteOptsToFile will write the options specified to the given file.
 func WriteOptsToFile(opts map[string]string, sep string, file string) error {
 	// Create a temp file, so in the case that the program crashes, we don't lose the original file.
