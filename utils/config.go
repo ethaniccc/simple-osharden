@@ -75,3 +75,37 @@ func WriteOptsToFile(opts map[string]string, sep string, file string) error {
 
 	return nil
 }
+
+// DelOptsFromFile will delete the options specified from the given file.
+func DelOptsFromFile(opts []string, sep string, file string) error {
+	buffer, err := os.ReadFile(file)
+	if err != nil {
+		return fmt.Errorf("unable to read %s: %s", file, err.Error())
+	}
+
+	lines := strings.Split(string(buffer), "\n")
+	for k, line := range lines {
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		split := strings.Split(line, sep)
+		if len(split) < 2 {
+			continue
+		}
+
+		opt := strings.TrimSpace(split[0])
+		for _, o := range opts {
+			if opt == o {
+				lines[k] = ""
+			}
+		}
+	}
+
+	// Write to the file.
+	if err := os.WriteFile(file, []byte(strings.Join(lines, "\n")), 0644); err != nil {
+		return fmt.Errorf("unable to write to %s: %s", file, err.Error())
+	}
+
+	return nil
+}
