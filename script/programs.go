@@ -7,6 +7,7 @@ func init() {
 	RegisterScript(&UpdatePrograms{})
 }
 
+// RemovePrograms is a script that removes programs that may increase the attack surface of the system.
 type RemovePrograms struct {
 }
 
