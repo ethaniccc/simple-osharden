@@ -94,6 +94,7 @@ func RunScript(s Script) error {
 
 		return ws.RunOnWindows()
 	case "linux":
+		ResetTerminal()
 		ls, ok := s.(LinuxSupportedScript)
 		if !ok {
 			return fmt.Errorf("not supported on linux")
