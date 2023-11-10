@@ -42,6 +42,12 @@ func (s *ServiceConfiguration) RunOnLinux() error {
 		}
 	}
 
+	// TODO: Do something other than simply disabling NFS. Anyone wanna help
+	// me out with NFS options, perhaps?
+	if err := s.configureNFS(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -187,4 +193,35 @@ func (s *ServiceConfiguration) configureApache() error {
 	}
 
 	return utils.WriteOptsToFile(apacheOpts, " ", "/etc/apache2/conf-enabled/security.conf")
+}
+
+func (s *ServiceConfiguration) configureNFS() error {
+	if prompts.Confirm("Would you like to disable NFS?") {
+		if err := ExecuteLoggedCommands([]LoggedCommand{
+			{"Stopping NFS", "systemctl stop nfs", true},
+			{"Disabling NFS", "systemctl disable nfs", true},
+
+			{"Stopping nfs-blkmap", "systemctl stop nfs-blkmap", true},
+			{"Disabling nfs-blkmap", "systemctl disable nfs-blkmap", true},
+
+			{"Stopping nfs-idmapd", "systemctl stop nfs-idmapd", true},
+			{"Disabling nfs-idmapd", "systemctl disable nfs-idmapd", true},
+
+			{"Stopping nfs-mountd", "systemctl stop nfs-mountd", true},
+			{"Disabling nfs-mountd", "systemctl disable nfs-mountd", true},
+
+			{"Stopping nfsdcld", "systemctl stop nfsdcld", true},
+			{"Disabling nfsdcld", "systemctl disable nfsdcld", true},
+
+			{"Stopping nfs-server", "systemctl stop nfs-server", true},
+			{"Disabling nfs-server", "systemctl disable nfs-server", true},
+
+			{"Stopping nfs-kernel-server", "systemctl stop nfs-kernel-server", true},
+			{"Disabling nfs-kernel-server", "systemctl disable nfs-kernel-server", true},
+		}); err != nil {
+			return fmt.Errorf("unable to disable NFS: %s", err.Error())
+		}
+	}
+
+	return nil
 }

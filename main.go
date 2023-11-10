@@ -98,7 +98,8 @@ func main() {
 				script.ResetTerminal()
 			}
 
-			prompts.RawResponsePrompt("All scripts finished running successfully\n[Press enter to continue]")
+			log.Info("All scripts finished running successfully")
+			prompts.RawResponsePrompt("[Press enter to continue]")
 			continue
 		}
 
@@ -113,7 +114,8 @@ func main() {
 		if err := script.RunScript(s); err != nil {
 			prompts.RawResponsePrompt(fmt.Sprintf("The script failed to run due to an error: %s\n[Press enter to continue]", err.Error()))
 		} else {
-			prompts.RawResponsePrompt("Script finished running successfully\n[Press enter to continue]")
+			log.Info("Script finished running successfully")
+			prompts.RawResponsePrompt("[Press enter to continue]")
 		}
 
 		runtime.GC()
