@@ -163,7 +163,7 @@ func (s *NetworkApps) RunOnLinux() error {
 			continue
 		}
 
-		if err := s.appUninstallLinux(proc); err != nil {
+		if err := AppUninstallLinux(proc); err != nil {
 			return fmt.Errorf("unable to uninstall program: %s", err.Error())
 		}
 	}
@@ -171,35 +171,6 @@ func (s *NetworkApps) RunOnLinux() error {
 	ResetTerminal()
 	if err := RunCommand("apt autoremove"); err != nil {
 		return fmt.Errorf("unable to autoremove packages: %s", err.Error())
-	}
-
-	return nil
-}
-
-// appUninstallLinux will uninstall the program on linux and remove any traces of it.
-func (s *NetworkApps) appUninstallLinux(program string) error {
-	// Uninstall the program.
-	ResetTerminal()
-	RunCommand(fmt.Sprintf("apt purge %s", program))
-
-	// Find any traces of the program and remove them.
-	dat, err := GetCommandOutput(fmt.Sprintf("find / -name \"%s\"", program))
-	if err != nil {
-		return fmt.Errorf("unable to find traces of program: %s", err.Error())
-	}
-
-	for _, line := range strings.Split(dat, "\n") {
-		if line == "" {
-			continue
-		}
-
-		if strings.HasPrefix(line, "find:") {
-			continue
-		}
-
-		if err := RunCommand(fmt.Sprintf("rm -rf %s", line)); err != nil {
-			return fmt.Errorf("unable to remove %s at [%s]: %s", program, line, err.Error())
-		}
 	}
 
 	return nil

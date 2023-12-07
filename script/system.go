@@ -1,6 +1,10 @@
 package script
 
-import "github.com/ethaniccc/simple-osharden/utils"
+import (
+	"fmt"
+
+	"github.com/ethaniccc/simple-osharden/utils"
+)
 
 func init() {
 	RegisterScript(&SystemConfiguration{})
@@ -19,9 +23,19 @@ func (s *SystemConfiguration) Description() string {
 }
 
 func (s *SystemConfiguration) RunOnLinux() error {
-	return utils.WriteOptsToFile(map[string]string{
+	if err := utils.WriteOptsToFile(map[string]string{
 		"fs.suid_dumpable":          "0",
 		"kernel.randomize_va_space": "2",
 		"kernel.exec-shield":        "1",
-	}, " = ", "/etc/sysctl.conf")
+	}, " = ", "/etc/sysctl.conf"); err != nil {
+		return fmt.Errorf("unable to write to /etc/sysctl.conf: %s", err.Error())
+	}
+
+	if err := utils.WriteOptsToFile(map[string]string{
+		"local_events": "yes",
+	}, " = ", "/etc/audit/auditd.conf"); err != nil {
+		return fmt.Errorf("unable to write to /etc/audit/auditd.conf: %s", err.Error())
+	}
+
+	return nil
 }

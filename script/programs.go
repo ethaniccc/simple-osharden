@@ -1,6 +1,11 @@
 package script
 
-import "github.com/ethaniccc/simple-osharden/prompts"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/ethaniccc/simple-osharden/prompts"
+)
 
 func init() {
 	RegisterScript(&RemovePrograms{})
@@ -104,4 +109,33 @@ func (s *UpdatePrograms) Description() string {
 func (s *UpdatePrograms) RunOnLinux() error {
 	ResetTerminal()
 	return RunCommand("apt upgrade")
+}
+
+// appUninstallLinux will uninstall the program on linux and remove any traces of it.
+func AppUninstallLinux(program string) error {
+	// Uninstall the program.
+	ResetTerminal()
+	RunCommand(fmt.Sprintf("apt purge %s", program))
+
+	// Find any traces of the program and remove them.
+	dat, err := GetCommandOutput(fmt.Sprintf("find / -name \"%s\"", program))
+	if err != nil {
+		return fmt.Errorf("unable to find traces of program: %s", err.Error())
+	}
+
+	for _, line := range strings.Split(dat, "\n") {
+		if line == "" {
+			continue
+		}
+
+		if strings.HasPrefix(line, "find:") {
+			continue
+		}
+
+		if err := RunCommand(fmt.Sprintf("rm -rf %s", line)); err != nil {
+			return fmt.Errorf("unable to remove %s at [%s]: %s", program, line, err.Error())
+		}
+	}
+
+	return nil
 }
